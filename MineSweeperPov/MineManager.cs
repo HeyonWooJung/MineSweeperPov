@@ -11,17 +11,16 @@ namespace MineSweeperPov
         int _nearMines;
         bool _isMine;
         bool _isExplored;
+        bool _isPinned;
 
         public int NearMines
         {
             get { return _nearMines; }
-            set { _nearMines = value; }
         }
 
         public bool IsMine
         {
             get { return _isMine; }
-            set { _isMine = value; }
         }
 
         public bool IsExplored
@@ -30,6 +29,21 @@ namespace MineSweeperPov
             set { _isExplored = value; }
         }
 
+        public bool IsPinned
+        {
+            get { return _isPinned; }
+            set { _isPinned = value; }
+        }
+
+        public void SetMine()
+        {
+            _isMine = true;
+        }
+
+        public void IncreaseNearMines()
+        {
+            _nearMines++;
+        }
     }
 
     class MineManager
@@ -37,21 +51,21 @@ namespace MineSweeperPov
         Mine[,] _map;
 
         //맵 생성
-        public void MakeMap(int size, int mines, Random random)
+        public void MakeMap(int size, int mines)
         {
             _map = new Mine[size, size];
 
             //지뢰 놓기
             for (int i = 0; i < mines; i++)
             {
-                int x = random.Next(0, size);
-                int y = random.Next(0, size);
+                int x = Statics.Random.Next(0, size);
+                int y = Statics.Random.Next(0, size);
                 if (_map[x,y].IsMine || (x == 0 && y == 0))
                 {
                     i--;
                     continue;
                 }
-                _map[x, y].IsMine = true;
+                _map[x, y].SetMine();
             }
 
             //주변 지뢰 수 세기
@@ -69,7 +83,7 @@ namespace MineSweeperPov
                                 {
                                     if (_map[k,l].IsMine)
                                     {
-                                        _map[i, j].NearMines++;
+                                        _map[i, j].IncreaseNearMines();
                                     }
                                 }
                             }
@@ -79,16 +93,46 @@ namespace MineSweeperPov
             }
         }
 
-        //맵 출력(테스트용)
+        //맵 출력
         public void PrintMap()
         {
-            for (int i = 0; i < _map.GetLength(1); i++)
+            for (int i = 0; i < _map.GetLength(0); i++)
             {
                 for (int j = 0; j < _map.GetLength(1); j++)
                 {
                     if (_map[i, j].IsMine)
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                    }
+                    else
+                    {
+                        switch(_map[i, j].NearMines)
+                        {
+                            case 1:
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                                break;
+                            case 2:
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                break;
+                            case 3:
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                break;
+                            case 4:
+                                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                                break;
+                            case 5:
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
+                                break;
+                            case 6:
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                break;
+                            case 7:
+                                Console.ForegroundColor = ConsoleColor.DarkGray;
+                                break;
+                            case 8:
+                                Console.ForegroundColor = ConsoleColor.Gray;
+                                break;
+                        }
                     }
                     Console.Write($"{_map[i, j].NearMines}");
                     Console.ResetColor();

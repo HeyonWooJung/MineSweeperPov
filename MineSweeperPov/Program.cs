@@ -6,14 +6,21 @@ using System.Threading.Tasks;
 
 namespace MineSweeperPov
 {
+    static class Statics
+    {
+        public static Random Random = new Random();
+    }
     internal class Program
     {
         static void Main(string[] args)
         {
             MineManager mineManager = new MineManager();
-            Random rnd = new Random();
-            mineManager.MakeMap(9, 10, rnd);
-            mineManager.PrintMap();
+            Player player = new Player();
+            GameManager gameManager = new GameManager(mineManager, player);
+            //mineManager.MakeMap(9, 10, rnd);
+            //mineManager.PrintMap();
+
+            gameManager.GameStart();
         }
     }
 }
