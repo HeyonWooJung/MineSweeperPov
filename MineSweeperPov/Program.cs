@@ -10,6 +10,10 @@ namespace MineSweeperPov
     {
         static void Main(string[] args)
         {
+            MineManager mineManager = new MineManager();
+            Random rnd = new Random();
+            mineManager.MakeMap(9, 10, rnd);
+            mineManager.PrintMap();
         }
     }
 }
