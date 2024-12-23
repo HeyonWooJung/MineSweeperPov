@@ -50,6 +50,16 @@ namespace MineSweeperPov
     {
         Mine[,] _map;
 
+
+        public Mine GetMine(int x, int y)
+        {
+            return _map[x, y];
+        }
+
+        public void SetMine(int x, int y, Mine m)
+        {
+            _map[x, y] = m;
+        }
         //맵 생성
         public void MakeMap(int size, int mines)
         {
@@ -140,6 +150,13 @@ namespace MineSweeperPov
                 }
                 Console.WriteLine();
             }
+        }
+
+        //주변 빈 공간 밝히기
+        public void UnveilEmptys(int x, int y)
+        {
+            //스택으로 구현해보기?
+            Stack<Mine> mines = new Stack<Mine>();
         }
     }
 }

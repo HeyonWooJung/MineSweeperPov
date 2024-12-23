@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,10 @@ namespace MineSweeperPov
         {
             bool difficultSelect = true;
             bool isGameRunning = true;
+            ConsoleKeyInfo input;
+
+            Stopwatch tick = new Stopwatch();
+            Stopwatch watch = new Stopwatch();
 
             while (difficultSelect)
             {
@@ -51,12 +56,57 @@ namespace MineSweeperPov
                         break;
                 }
             }
+
+            tick.Start();
+            watch.Start();
             Console.Clear();
+            _mineManager.PrintMap();
+
             while (isGameRunning)
             {
-                _mineManager.PrintMap();
-                Console.ReadLine();
+                //키가 눌렸을때만 작동
+                if (Console.KeyAvailable)
+                {
+                    input = Console.ReadKey(true);
+                    switch (input.Key)
+                    {
+                        case ConsoleKey.A:
+                        case ConsoleKey.LeftArrow:
+
+                            break;
+                        case ConsoleKey.W:
+                        case ConsoleKey.UpArrow:
+
+                            break;
+                        case ConsoleKey.S:
+                        case ConsoleKey.DownArrow:
+
+                            break;
+                        case ConsoleKey.D:
+                        case ConsoleKey.RightArrow:
+
+                            break;
+                        case ConsoleKey.Spacebar:
+                            //핀 꽂게 할거임
+
+                            break;
+                    }
+                }
+
+                //얘는 계속 돌아감
+                if(tick.ElapsedMilliseconds >= 160) //약 1프레임 
+                {
+                    //계속 업데이트 해야되는 거 넣기
+                }
+
+
             }
+        }
+
+        //뭔가 바뀔때 업데이트해야되는 애들 넣어두기
+        public void GameUpdate()
+        {
+
         }
     }
 }
