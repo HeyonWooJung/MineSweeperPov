@@ -72,18 +72,25 @@ namespace MineSweeperPov
                     {
                         case ConsoleKey.A:
                         case ConsoleKey.LeftArrow:
+                            //player 움직이기
 
                             break;
                         case ConsoleKey.W:
                         case ConsoleKey.UpArrow:
+                            //player 움직이기
+
 
                             break;
                         case ConsoleKey.S:
                         case ConsoleKey.DownArrow:
+                            //player 움직이기
+
 
                             break;
                         case ConsoleKey.D:
                         case ConsoleKey.RightArrow:
+                            //player 움직이기
+
 
                             break;
                         case ConsoleKey.Spacebar:
@@ -94,7 +101,7 @@ namespace MineSweeperPov
                 }
 
                 //얘는 계속 돌아감
-                if(tick.ElapsedMilliseconds >= 160) //약 1프레임 
+                if(tick.ElapsedMilliseconds >= 16.6) //약 1프레임 
                 {
                     //계속 업데이트 해야되는 거 넣기
                 }
