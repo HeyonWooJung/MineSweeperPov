@@ -59,8 +59,11 @@ namespace MineSweeperPov
 
             tick.Start();
             watch.Start();
-            Console.Clear();
+            _mineManager.UnveilNearby(0, 0);
             _mineManager.PrintMap();
+            _player.SetLimits(_mineManager.MapSizeX(), _mineManager.MapSizeY());
+            Console.CursorVisible = false;
+            Console.SetCursorPosition(0, 0);
 
             while (isGameRunning)
             {
@@ -72,32 +75,29 @@ namespace MineSweeperPov
                     {
                         case ConsoleKey.A:
                         case ConsoleKey.LeftArrow:
-                            //player 움직이기
-
+                            _player.Move(-4, 0);
                             break;
                         case ConsoleKey.W:
                         case ConsoleKey.UpArrow:
-                            //player 움직이기
-
-
+                            _player.Move(0, -1);
                             break;
                         case ConsoleKey.S:
                         case ConsoleKey.DownArrow:
-                            //player 움직이기
-
-
+                            _player.Move(0, 1);
                             break;
                         case ConsoleKey.D:
                         case ConsoleKey.RightArrow:
-                            //player 움직이기
-
-
+                            _player.Move(4, 0);
                             break;
                         case ConsoleKey.Spacebar:
-                            //핀 꽂게 할거임
+                            //핀 꽂게 할거임 스페이스 누른 상태로 방향?
 
                             break;
                     }
+                    //_mineManager.UnveilEmptys(_player.GetX(), _player.GetY());
+                    _mineManager.UnveilNearby(_player.GetX(), _player.GetY());
+                    _mineManager.PrintMap();
+                    _player.Draw();
                 }
 
                 //얘는 계속 돌아감
