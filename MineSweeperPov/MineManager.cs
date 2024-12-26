@@ -66,33 +66,67 @@ namespace MineSweeperPov
     class MineManager
     {
         Mine[,] _map;
+        Mine[] _mineArr;
+
+        int _remainMines = 0;
+
+        public int RemainMines
+        {
+            get { return _remainMines; }
+            set { _remainMines= value; }
+        }
+
+        public Mine GetMine(int x, int y)
+        {
+            return _map[y, x];
+        }
+
+        public void SetPin(int x, int y)
+        {
+            if (_remainMines > 0)
+            {
+                if (_map[y, x].IsPinned)
+                {
+                    _remainMines++;
+                }
+                else
+                {
+                    _remainMines--;
+                }
+                _map[y, x].IsPinned = !_map[y, x].IsPinned;
+
+            }
+        }
 
         public int MapSizeX()
         {
-            return _map.GetLength(0);
+            return _map.GetLength(1);
         }
 
         public int MapSizeY()
         {
-            return _map.GetLength(1);
+            return _map.GetLength(0);
         }
 
         //맵 생성
         public void MakeMap(int size, int mines)
         {
             _map = new Mine[size, size];
+            _mineArr = new Mine[mines];
+            _remainMines = mines;
 
             //지뢰 놓기
             for (int i = 0; i < mines; i++)
             {
                 int x = Statics.Random.Next(0, size);
                 int y = Statics.Random.Next(0, size);
-                if (_map[x, y].IsMine || (x == 0 && y == 0))
+                if (_map[y, x].IsMine || (x == 0 && y == 0))
                 {
                     i--;
                     continue;
                 }
-                _map[x, y].SetMine();
+                _map[y, x].SetMine();
+                _mineArr[i].SetXY(x, y);
             }
 
             //주변 지뢰 수 세기
@@ -130,10 +164,16 @@ namespace MineSweeperPov
                 Console.Write(" | ");
                 for (int j = 0; j < _map.GetLength(1); j++)
                 {
-                    if (_map[i, j].IsMine)
+                    /*if (_map[i, j].IsMine)
                     {
                         Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.BackgroundColor = ConsoleColor.Red;
                         Console.Write("*");
+                    }*/
+                    if (_map[i, j].IsPinned)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("P");
                     }
                     else if (_map[i, j].IsExplored == false)
                     {
@@ -210,22 +250,25 @@ namespace MineSweeperPov
                 mine = mines.Pop();
                 _map[mine.Y, mine.X].IsExplored = true;
 
-                if (mine.X - 1 >= 0 && _map[mine.Y, mine.X - 1].NearMines == 0 && _map[mine.Y, mine.X - 1].IsExplored == false)
+                if (mine.NearMines == 0)
                 {
-                    mines.Push(_map[mine.Y, mine.X - 1]);
-                }
-                if (mine.X + 1 < _map.GetLength(1) && _map[mine.Y, mine.X + 1].NearMines == 0 && _map[mine.Y, mine.X + 1].IsExplored == false)
-                {
-                    mines.Push(_map[mine.Y, mine.X + 1]);
-                }
+                    if (mine.X - 1 >= 0 && _map[mine.Y, mine.X - 1].NearMines == 0 && _map[mine.Y, mine.X - 1].IsExplored == false)
+                    {
+                        mines.Push(_map[mine.Y, mine.X - 1]);
+                    }
+                    if (mine.X + 1 < _map.GetLength(1) && _map[mine.Y, mine.X + 1].NearMines == 0 && _map[mine.Y, mine.X + 1].IsExplored == false)
+                    {
+                        mines.Push(_map[mine.Y, mine.X + 1]);
+                    }
 
-                if (mine.Y - 1 >= 0 && _map[mine.Y - 1, mine.X].NearMines == 0 && _map[mine.Y - 1, mine.X].IsExplored == false)
-                {
-                    mines.Push(_map[mine.Y - 1, mine.X]);
-                }
-                if (mine.Y + 1 < _map.GetLength(0) && _map[mine.Y + 1, mine.X].NearMines == 0 && _map[mine.Y + 1, mine.X].IsExplored == false)
-                {
-                    mines.Push(_map[mine.Y + 1, mine.X]);
+                    if (mine.Y - 1 >= 0 && _map[mine.Y - 1, mine.X].NearMines == 0 && _map[mine.Y - 1, mine.X].IsExplored == false)
+                    {
+                        mines.Push(_map[mine.Y - 1, mine.X]);
+                    }
+                    if (mine.Y + 1 < _map.GetLength(0) && _map[mine.Y + 1, mine.X].NearMines == 0 && _map[mine.Y + 1, mine.X].IsExplored == false)
+                    {
+                        mines.Push(_map[mine.Y + 1, mine.X]);
+                    }
                 }
             }
         }

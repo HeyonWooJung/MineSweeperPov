@@ -75,23 +75,55 @@ namespace MineSweeperPov
                     {
                         case ConsoleKey.A:
                         case ConsoleKey.LeftArrow:
-                            _player.Move(-4, 0);
+                            if (_player.IsPinning)
+                            {
+                                _mineManager.SetPin(_player.GetX() - 1, _player.GetY());
+                                _player.SetPin();
+                            }
+                            else
+                            {
+                                _player.Move(-4, 0);
+                            }
                             break;
                         case ConsoleKey.W:
                         case ConsoleKey.UpArrow:
-                            _player.Move(0, -1);
+                            if (_player.IsPinning)
+                            {
+                                _mineManager.SetPin(_player.GetX(), _player.GetY() - 1);
+                                _player.SetPin();
+                            }
+                            else
+                            {
+                                _player.Move(0, -1);
+                            }
                             break;
                         case ConsoleKey.S:
                         case ConsoleKey.DownArrow:
-                            _player.Move(0, 1);
+                            if (_player.IsPinning)
+                            {
+                                _mineManager.SetPin(_player.GetX(), _player.GetY() + 1);
+                                _player.SetPin();
+                            }
+                            else
+                            {
+                                _player.Move(0, 1);
+                            }
                             break;
                         case ConsoleKey.D:
                         case ConsoleKey.RightArrow:
-                            _player.Move(4, 0);
+                            if (_player.IsPinning)
+                            {
+                                _mineManager.SetPin(_player.GetX() + 1, _player.GetY());
+                                _player.SetPin();
+                            }
+                            else
+                            {
+                                _player.Move(4, 0);
+                            }
                             break;
                         case ConsoleKey.Spacebar:
                             //핀 꽂게 할거임 스페이스 누른 상태로 방향?
-
+                            _player.SetPin();
                             break;
                     }
                     //_mineManager.UnveilEmptys(_player.GetX(), _player.GetY());

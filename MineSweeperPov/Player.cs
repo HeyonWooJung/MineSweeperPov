@@ -13,6 +13,13 @@ namespace MineSweeperPov
         int _xLimit = 0;
         int _yLimit = 0;
         char _sprite = '▶';
+        char _preSprite;
+        bool _isPinning = false;
+
+        public bool IsPinning
+        {
+            get { return _isPinning; }
+        }
 
         public int GetX()
         {
@@ -102,6 +109,21 @@ namespace MineSweeperPov
             Console.ForegroundColor = ConsoleColor.DarkMagenta;
             Console.Write(_sprite);
             Console.ResetColor();
+        }
+
+        public void SetPin()
+        {
+            //스페이스 누르고 방향 설정하면 거기에 깃발 박게 하기
+            _isPinning = !_isPinning;
+            if (_isPinning )
+            {
+                _preSprite = _sprite;
+                _sprite = '■';
+            }
+            else
+            {
+                _sprite = _preSprite;
+            }
         }
     }
 }
