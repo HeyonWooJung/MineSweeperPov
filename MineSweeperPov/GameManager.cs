@@ -60,10 +60,11 @@ namespace MineSweeperPov
             tick.Start();
             watch.Start();
             _mineManager.UnveilNearby(0, 0);
-            _mineManager.PrintMap();
+            _mineManager.PrintMap(false);
             _player.SetLimits(_mineManager.MapSizeX(), _mineManager.MapSizeY());
             Console.CursorVisible = false;
             Console.SetCursorPosition(0, 0);
+            DrawInfo(_mineManager.MapSizeY(), watch);
 
             while (isGameRunning)
             {
@@ -128,24 +129,53 @@ namespace MineSweeperPov
                     }
                     //_mineManager.UnveilEmptys(_player.GetX(), _player.GetY());
                     _mineManager.UnveilNearby(_player.GetX(), _player.GetY());
-                    _mineManager.PrintMap();
+                    _mineManager.PrintMap(false);
                     _player.Draw();
+                    DrawInfo(_mineManager.MapSizeY(), watch);
                 }
 
                 //얘는 계속 돌아감
-                if(tick.ElapsedMilliseconds >= 16.6) //약 1프레임 
+                if(tick.ElapsedMilliseconds >= 1000)  
                 {
                     //계속 업데이트 해야되는 거 넣기
+                    DrawInfo(_mineManager.MapSizeY(), watch);
                 }
 
-
+                isGameRunning = SetGameEnd();
             }
+            Console.WriteLine("소요시간: " + (watch.ElapsedMilliseconds / 1000).ToString("D3"));
         }
 
-        //뭔가 바뀔때 업데이트해야되는 애들 넣어두기
-        public void GameUpdate()
+        public void DrawInfo(int height, Stopwatch watch)
         {
+            Console.SetCursorPosition(0, height + 2);
+            Console.Write($"Time {(watch.ElapsedMilliseconds/1000).ToString("D3")}");
+            //중간 공백 계산
+            int x = _mineManager.MapSizeX() * 4 - 16;//가로 사이즈 받아서 * 4(지뢰 한 칸 표현하는데 4칸이 필요) + 1(시작점 공백) - 17(시간표시 8칸, 지뢰수 표시 9칸)
+            for (int i = 0; i < x; i++)
+            {
+                Console.Write(" ");
+            }
+            Console.Write($"Mines {_mineManager.RemainMines.ToString("D3")}");
+        }
 
+        public bool SetGameEnd()
+        {
+            if (_mineManager.IsEverythingSearched() || _mineManager.IsEveryMinePinned())
+            {
+                Console.Clear();
+                Console.WriteLine("다 찾음");
+                return false;
+            }
+            Mine playerMine = _mineManager.GetMine(_player.GetX(), _player.GetY());
+            if (playerMine.IsPinned == false && playerMine.IsMine)
+            {
+                Console.Clear();
+                _mineManager.PrintMap(true);
+                Console.WriteLine("지뢰 밟음");
+                return false;
+            }
+            return true;
         }
     }
 }

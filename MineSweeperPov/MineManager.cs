@@ -73,7 +73,7 @@ namespace MineSweeperPov
         public int RemainMines
         {
             get { return _remainMines; }
-            set { _remainMines= value; }
+            set { _remainMines = value; }
         }
 
         public Mine GetMine(int x, int y)
@@ -83,18 +83,28 @@ namespace MineSweeperPov
 
         public void SetPin(int x, int y)
         {
-            if (_remainMines > 0)
+            if (y >= 0 && y < _map.GetLength(0) && x >= 0 && x < _map.GetLength(1))
             {
-                if (_map[y, x].IsPinned)
+                if (_remainMines > 0)
                 {
-                    _remainMines++;
+                    if (_map[y, x].IsPinned)
+                    {
+                        _remainMines++;
+                    }
+                    else
+                    {
+                        _remainMines--;
+                    }
+                    _map[y, x].IsPinned = !_map[y, x].IsPinned;
                 }
                 else
                 {
-                    _remainMines--;
+                    if (_map[y, x].IsPinned)
+                    {
+                        _remainMines++;
+                        _map[y, x].IsPinned = !_map[y, x].IsPinned;
+                    }
                 }
-                _map[y, x].IsPinned = !_map[y, x].IsPinned;
-
             }
         }
 
@@ -156,7 +166,7 @@ namespace MineSweeperPov
         }
 
         //맵 출력
-        public void PrintMap()
+        public void PrintMap(bool isEnd)
         {
             Console.SetCursorPosition(0, 0);
             for (int i = 0; i < _map.GetLength(0); i++)
@@ -174,6 +184,12 @@ namespace MineSweeperPov
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write("P");
+                    }
+                    else if (_map[i, j].IsMine && isEnd)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.BackgroundColor = ConsoleColor.Red;
+                        Console.Write("*");
                     }
                     else if (_map[i, j].IsExplored == false)
                     {
@@ -228,7 +244,7 @@ namespace MineSweeperPov
                     {
                         //1차배열이 y임
                         _map[k, l].IsExplored = true;
-                        if(k == y ||  l == x)
+                        if (k == y || l == x)
                         {
                             UnveilEmptys(l, k);
                         }
@@ -271,6 +287,31 @@ namespace MineSweeperPov
                     }
                 }
             }
+        }
+
+        public bool IsEverythingSearched()
+        {
+            foreach (var mine in _map)
+            {
+                if (mine.IsExplored == false)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public bool IsEveryMinePinned()
+        {
+            foreach (var mine in _mineArr)
+            {
+                if (_map[mine.Y, mine.X].IsPinned == false)
+                {
+
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
