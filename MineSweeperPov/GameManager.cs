@@ -74,8 +74,6 @@ namespace MineSweeperPov
 
                 if (isGameRunning)
                 {
-                    tick.Start();
-                    watch.Start();
 
                     _mineManager.UnveilNearby(0, 0); //시작지점 밝혀주기
                     _mineManager.PrintMap(false);
@@ -86,6 +84,9 @@ namespace MineSweeperPov
                     Console.SetCursorPosition(0, _mineManager.MapSizeY() + 1);
                     Console.WriteLine("아무 키를 누르면 시작합니다.");
                     Console.ReadKey(true);
+
+                    tick.Start();
+                    watch.Start();
 
                     DrawInfo(_mineManager.MapSizeY(), watch);
                     _player.Draw();
