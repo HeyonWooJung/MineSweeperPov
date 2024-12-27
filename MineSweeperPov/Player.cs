@@ -21,6 +21,15 @@ namespace MineSweeperPov
             get { return _isPinning; }
         }
 
+        public void ResetPlayer()
+        {
+            _posX = 4;
+            _posY = 0;
+            _xLimit = 0;
+            _yLimit = 0;
+            _sprite = '▶';
+        }
+
         public int GetX()
         {
             if ((_posX / 4) - 1 <= 0)

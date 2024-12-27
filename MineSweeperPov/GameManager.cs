@@ -21,149 +21,181 @@ namespace MineSweeperPov
         public void GameStart()
         {
             bool difficultSelect = true;
-            bool isGameRunning = true;
+            bool isGameRunning = false;
+            bool runProgram = true;
             ConsoleKeyInfo input;
 
             Stopwatch tick = new Stopwatch(); //초 세기
             Stopwatch watch = new Stopwatch(); //경과 시간
 
             StartScreen();
-
-            while (difficultSelect)
+            while (runProgram)
             {
-
-                Console.WriteLine("난이도를 선택해주세요\n" +
-                    "1.초급  2. 중급  3. 고급");
-                switch (Console.ReadKey(true).Key)
+                Console.Clear();
+                Console.CursorVisible = true;
+                _player.ResetPlayer();
+                while (difficultSelect)
                 {
-                    case ConsoleKey.D1:
-                    case ConsoleKey.NumPad1:
-                        _mineManager.MakeMap(9, 10);
-                        difficultSelect = false;
-                        break;
-                    case ConsoleKey.D2:
-                    case ConsoleKey.NumPad2:
-                        _mineManager.MakeMap(12, 20);
-                        difficultSelect = false;
-                        break;
-                    case ConsoleKey.D3:
-                    case ConsoleKey.NumPad3:
-                        _mineManager.MakeMap(16, 40);
-                        difficultSelect = false;
-                        break;
-                    default:
-                        Console.Clear();
-                        Console.WriteLine("잘못 입력하셨습니다");
-                        difficultSelect = true;
-                        break;
-                }
-            }
-
-            tick.Start();
-            watch.Start();
-
-            _mineManager.UnveilNearby(0, 0); //시작지점 밝혀주기
-            _mineManager.PrintMap(false);
-            _player.SetLimits(_mineManager.MapSizeX(), _mineManager.MapSizeY());
-            Console.CursorVisible = false;
-
-            Console.SetCursorPosition(0, 0);
-            Console.SetCursorPosition(0, _mineManager.MapSizeY() + 1);
-            Console.WriteLine("아무 키를 누르면 시작합니다.");
-            Console.ReadKey(true);
-
-            DrawInfo(_mineManager.MapSizeY(), watch);
-            _player.Draw();
-            Console.SetCursorPosition(0, _mineManager.MapSizeY() + 1);
-            Console.WriteLine("WASD 또는 방향키: 이동 | Space + 이동: 해당 방향에 깃발 세우기 | ESC: 종료");
-
-            while (isGameRunning)
-            {
-                //키가 눌렸을때만 작동
-                if (Console.KeyAvailable)
-                {
-                    input = Console.ReadKey(true);
-                    switch (input.Key)
+                    Console.WriteLine("난이도를 선택해주세요\n" +
+                        "1.초급  2. 중급  3. 고급  \nESC: 프로그램 종료");
+                    switch (Console.ReadKey(true).Key)
                     {
-                        case ConsoleKey.A:
-                        case ConsoleKey.LeftArrow:
-                            if (_player.IsPinning)
-                            {
-                                _mineManager.SetPin(_player.GetX() - 1, _player.GetY());
-                                _player.SetPin();
-                            }
-                            else
-                            {
-                                _player.Move(-4, 0);
-                            }
+                        case ConsoleKey.D1:
+                        case ConsoleKey.NumPad1:
+                            _mineManager.MakeMap(9, 10);
+                            difficultSelect = false;
+                            isGameRunning = true;
                             break;
-                        case ConsoleKey.W:
-                        case ConsoleKey.UpArrow:
-                            if (_player.IsPinning)
-                            {
-                                _mineManager.SetPin(_player.GetX(), _player.GetY() - 1);
-                                _player.SetPin();
-                            }
-                            else
-                            {
-                                _player.Move(0, -1);
-                            }
+                        case ConsoleKey.D2:
+                        case ConsoleKey.NumPad2:
+                            _mineManager.MakeMap(12, 20);
+                            difficultSelect = false;
+                            isGameRunning = true;
                             break;
-                        case ConsoleKey.S:
-                        case ConsoleKey.DownArrow:
-                            if (_player.IsPinning)
-                            {
-                                _mineManager.SetPin(_player.GetX(), _player.GetY() + 1);
-                                _player.SetPin();
-                            }
-                            else
-                            {
-                                _player.Move(0, 1);
-                            }
-                            break;
-                        case ConsoleKey.D:
-                        case ConsoleKey.RightArrow:
-                            if (_player.IsPinning)
-                            {
-                                _mineManager.SetPin(_player.GetX() + 1, _player.GetY());
-                                _player.SetPin();
-                            }
-                            else
-                            {
-                                _player.Move(4, 0);
-                            }
-                            break;
-                        case ConsoleKey.Spacebar:
-                            //핀 꽂게 할거임 스페이스 누른 상태로 방향
-                            _player.SetPin();
+                        case ConsoleKey.D3:
+                        case ConsoleKey.NumPad3:
+                            _mineManager.MakeMap(16, 40);
+                            difficultSelect = false;
+                            isGameRunning = true;
                             break;
                         case ConsoleKey.Escape:
-                            isGameRunning = false;
+                            Console.Clear();
+                            Console.WriteLine("프로그램을 종료합니다.");
+                            runProgram = false;
+                            difficultSelect = false;
                             break;
-                    }
-                    _mineManager.UnveilNearby(_player.GetX(), _player.GetY());
-                    _mineManager.PrintMap(false);
-                    _player.Draw();
-                    DrawInfo(_mineManager.MapSizeY(), watch);
-                    //ESC 종료
-                    if (isGameRunning == false)
-                    {
-                        Console.Clear();
-                        Console.WriteLine("ESC를 눌러 게임이 종료되었습니다.");
-                        break;
+                        default:
+                            Console.Clear();
+                            Console.WriteLine("잘못 입력하셨습니다");
+                            difficultSelect = true;
+                            break;
                     }
                 }
 
-                //초마다 시간 바꾸기
-                if (tick.ElapsedMilliseconds >= 1000)
+                if (isGameRunning)
                 {
+                    tick.Start();
+                    watch.Start();
+
+                    _mineManager.UnveilNearby(0, 0); //시작지점 밝혀주기
+                    _mineManager.PrintMap(false);
+                    _player.SetLimits(_mineManager.MapSizeX(), _mineManager.MapSizeY());
+                    Console.CursorVisible = false;
+
+                    Console.SetCursorPosition(0, 0);
+                    Console.SetCursorPosition(0, _mineManager.MapSizeY() + 1);
+                    Console.WriteLine("아무 키를 누르면 시작합니다.");
+                    Console.ReadKey(true);
+
                     DrawInfo(_mineManager.MapSizeY(), watch);
+                    _player.Draw();
+                    Console.SetCursorPosition(0, _mineManager.MapSizeY() + 1);
+                    Console.WriteLine("WASD 또는 방향키: 이동 | Space: 깃발 세우기 상태 | 깃발 세우기 상태에서 이동: 해당 방향으로 깃발 세우기 | ESC: 종료");
                 }
-                //종료조건 확인
-                isGameRunning = SetGameRun();
+
+                while (isGameRunning)
+                {
+                    //키가 눌렸을때만 작동
+                    if (Console.KeyAvailable)
+                    {
+                        input = Console.ReadKey(true);
+                        switch (input.Key)
+                        {
+                            case ConsoleKey.A:
+                            case ConsoleKey.LeftArrow:
+                                if (_player.IsPinning)
+                                {
+                                    _mineManager.SetPin(_player.GetX() - 1, _player.GetY());
+                                    _player.SetPin();
+                                }
+                                else
+                                {
+                                    _player.Move(-4, 0);
+                                }
+                                break;
+                            case ConsoleKey.W:
+                            case ConsoleKey.UpArrow:
+                                if (_player.IsPinning)
+                                {
+                                    _mineManager.SetPin(_player.GetX(), _player.GetY() - 1);
+                                    _player.SetPin();
+                                }
+                                else
+                                {
+                                    _player.Move(0, -1);
+                                }
+                                break;
+                            case ConsoleKey.S:
+                            case ConsoleKey.DownArrow:
+                                if (_player.IsPinning)
+                                {
+                                    _mineManager.SetPin(_player.GetX(), _player.GetY() + 1);
+                                    _player.SetPin();
+                                }
+                                else
+                                {
+                                    _player.Move(0, 1);
+                                }
+                                break;
+                            case ConsoleKey.D:
+                            case ConsoleKey.RightArrow:
+                                if (_player.IsPinning)
+                                {
+                                    _mineManager.SetPin(_player.GetX() + 1, _player.GetY());
+                                    _player.SetPin();
+                                }
+                                else
+                                {
+                                    _player.Move(4, 0);
+                                }
+                                break;
+                            case ConsoleKey.Spacebar:
+                                //핀 꽂게 할거임 스페이스 누르고 방향
+                                _player.SetPin();
+                                break;
+                            case ConsoleKey.Escape:
+                                isGameRunning = false;
+                                break;
+                        }
+                        _mineManager.UnveilNearby(_player.GetX(), _player.GetY());
+                        _mineManager.PrintMap(false);
+                        _player.Draw();
+                        DrawInfo(_mineManager.MapSizeY(), watch);
+                        //ESC 종료
+                        if (isGameRunning == false)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("ESC를 눌러 게임이 종료되었습니다.");
+                            break;
+                        }
+                    }
+
+                    //초마다 시간 바꾸기
+                    if (tick.ElapsedMilliseconds >= 1000)
+                    {
+                        DrawInfo(_mineManager.MapSizeY(), watch);
+                    }
+                    //종료조건 확인
+                    isGameRunning = SetGameRun();
+                }
+
+                //완전 종료가 아니면
+                if (runProgram)
+                {
+                    //종료 시 소요시간 보여주기
+                    if (watch.IsRunning)
+                    {
+                        Console.WriteLine("소요시간: " + (watch.ElapsedMilliseconds / 1000).ToString("D3"));
+                        watch.Stop();
+                        tick.Stop();
+                    }
+                    Console.WriteLine("아무 키나 눌러 계속합니다.");
+                    Console.ReadKey(true);
+                    watch.Reset();
+                    tick.Reset();
+                    difficultSelect = true;
+                }
             }
-            //종료 시 소요시간 보여주기
-            Console.WriteLine("소요시간: " + (watch.ElapsedMilliseconds / 1000).ToString("D3"));
         }
 
         //시간초, 지뢰 수 표기
