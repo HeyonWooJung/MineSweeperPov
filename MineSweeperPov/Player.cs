@@ -8,7 +8,7 @@ namespace MineSweeperPov
 {
     internal class Player
     {
-        int _posX = 0;
+        int _posX = 4;
         int _posY = 0;
         int _xLimit = 0;
         int _yLimit = 0;
@@ -96,6 +96,7 @@ namespace MineSweeperPov
             }
         }
 
+        //플레이어 그리기
         public void Draw()
         {
             if (_posX > 0)
@@ -111,11 +112,11 @@ namespace MineSweeperPov
             Console.ResetColor();
         }
 
+        //스페이스 누르고 방향 설정하면 거기에 깃발 박게 하기
         public void SetPin()
         {
-            //스페이스 누르고 방향 설정하면 거기에 깃발 박게 하기
             _isPinning = !_isPinning;
-            if (_isPinning )
+            if (_isPinning)
             {
                 _preSprite = _sprite;
                 _sprite = '■';

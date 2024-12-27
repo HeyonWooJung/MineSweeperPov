@@ -24,8 +24,10 @@ namespace MineSweeperPov
             bool isGameRunning = true;
             ConsoleKeyInfo input;
 
-            Stopwatch tick = new Stopwatch();
-            Stopwatch watch = new Stopwatch();
+            Stopwatch tick = new Stopwatch(); //초 세기
+            Stopwatch watch = new Stopwatch(); //경과 시간
+
+            StartScreen();
 
             while (difficultSelect)
             {
@@ -59,12 +61,21 @@ namespace MineSweeperPov
 
             tick.Start();
             watch.Start();
-            _mineManager.UnveilNearby(0, 0);
+
+            _mineManager.UnveilNearby(0, 0); //시작지점 밝혀주기
             _mineManager.PrintMap(false);
             _player.SetLimits(_mineManager.MapSizeX(), _mineManager.MapSizeY());
             Console.CursorVisible = false;
+
             Console.SetCursorPosition(0, 0);
+            Console.SetCursorPosition(0, _mineManager.MapSizeY() + 1);
+            Console.WriteLine("아무 키를 누르면 시작합니다.");
+            Console.ReadKey(true);
+
             DrawInfo(_mineManager.MapSizeY(), watch);
+            _player.Draw();
+            Console.SetCursorPosition(0, _mineManager.MapSizeY() + 1);
+            Console.WriteLine("WASD 또는 방향키: 이동 | Space + 이동: 해당 방향에 깃발 세우기 | ESC: 종료");
 
             while (isGameRunning)
             {
@@ -123,33 +134,43 @@ namespace MineSweeperPov
                             }
                             break;
                         case ConsoleKey.Spacebar:
-                            //핀 꽂게 할거임 스페이스 누른 상태로 방향?
+                            //핀 꽂게 할거임 스페이스 누른 상태로 방향
                             _player.SetPin();
                             break;
+                        case ConsoleKey.Escape:
+                            isGameRunning = false;
+                            break;
                     }
-                    //_mineManager.UnveilEmptys(_player.GetX(), _player.GetY());
                     _mineManager.UnveilNearby(_player.GetX(), _player.GetY());
                     _mineManager.PrintMap(false);
                     _player.Draw();
                     DrawInfo(_mineManager.MapSizeY(), watch);
+                    //ESC 종료
+                    if (isGameRunning == false)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("ESC를 눌러 게임이 종료되었습니다.");
+                        break;
+                    }
                 }
 
-                //얘는 계속 돌아감
-                if(tick.ElapsedMilliseconds >= 1000)  
+                //초마다 시간 바꾸기
+                if (tick.ElapsedMilliseconds >= 1000)
                 {
-                    //계속 업데이트 해야되는 거 넣기
                     DrawInfo(_mineManager.MapSizeY(), watch);
                 }
-
-                isGameRunning = SetGameEnd();
+                //종료조건 확인
+                isGameRunning = SetGameRun();
             }
+            //종료 시 소요시간 보여주기
             Console.WriteLine("소요시간: " + (watch.ElapsedMilliseconds / 1000).ToString("D3"));
         }
 
+        //시간초, 지뢰 수 표기
         public void DrawInfo(int height, Stopwatch watch)
         {
             Console.SetCursorPosition(0, height + 2);
-            Console.Write($"Time {(watch.ElapsedMilliseconds/1000).ToString("D3")}");
+            Console.Write($"Time {(watch.ElapsedMilliseconds / 1000).ToString("D3")}");
             //중간 공백 계산
             int x = _mineManager.MapSizeX() * 4 - 16;//가로 사이즈 받아서 * 4(지뢰 한 칸 표현하는데 4칸이 필요) + 1(시작점 공백) - 17(시간표시 8칸, 지뢰수 표시 9칸)
             for (int i = 0; i < x; i++)
@@ -159,12 +180,22 @@ namespace MineSweeperPov
             Console.Write($"Mines {_mineManager.RemainMines.ToString("D3")}");
         }
 
-        public bool SetGameEnd()
+        //종료여부 확인
+        public bool SetGameRun()
         {
-            if (_mineManager.IsEverythingSearched() || _mineManager.IsEveryMinePinned())
+            if (_mineManager.IsEverythingSearched())
             {
                 Console.Clear();
-                Console.WriteLine("다 찾음");
+                _mineManager.PrintMap(true);
+                Console.WriteLine("모든 칸을 밝혔습니다");
+                Console.WriteLine("찾아낸 지뢰 수: " + _mineManager.FoundMines());
+                return false;
+            }
+            if (_mineManager.IsEveryMinePinned())
+            {
+                Console.Clear();
+                _mineManager.PrintMap(true);
+                Console.WriteLine("모든 지뢰를 찾았습니다");
                 return false;
             }
             Mine playerMine = _mineManager.GetMine(_player.GetX(), _player.GetY());
@@ -172,10 +203,18 @@ namespace MineSweeperPov
             {
                 Console.Clear();
                 _mineManager.PrintMap(true);
-                Console.WriteLine("지뢰 밟음");
+                Console.WriteLine("\n지뢰를 밟아 패배했습니다.\n찾아낸 지뢰 수: " + _mineManager.FoundMines() + "  ");
                 return false;
             }
             return true;
+        }
+
+        public void StartScreen()
+        {
+            Console.WriteLine("   ▄▄▄▄███▄▄▄▄    ▄█  ███▄▄▄▄      ▄████████                                             \r\n ▄██▀▀▀███▀▀▀██▄ ███  ███▀▀▀██▄   ███    ███                                             \r\n ███   ███   ███ ███▌ ███   ███   ███    █▀                                              \r\n ███   ███   ███ ███▌ ███   ███  ▄███▄▄▄                                                 \r\n ███   ███   ███ ███▌ ███   ███ ▀▀███▀▀▀                                                 \r\n ███   ███   ███ ███  ███   ███   ███    █▄                                              \r\n ███   ███   ███ ███  ███   ███   ███    ███                                             \r\n  ▀█   ███   █▀  █▀    ▀█   █▀    ██████████                                             \r\n                                                                                         \r\n   ▄████████  ▄█     █▄     ▄████████    ▄████████    ▄███████▄    ▄████████    ▄████████\r\n  ███    ███ ███     ███   ███    ███   ███    ███   ███    ███   ███    ███   ███    ███\r\n  ███    █▀  ███     ███   ███    █▀    ███    █▀    ███    ███   ███    █▀    ███    ███\r\n  ███        ███     ███  ▄███▄▄▄      ▄███▄▄▄       ███    ███  ▄███▄▄▄      ▄███▄▄▄▄██▀\r\n▀███████████ ███     ███ ▀▀███▀▀▀     ▀▀███▀▀▀     ▀█████████▀  ▀▀███▀▀▀     ▀▀███▀▀▀▀▀  \r\n         ███ ███     ███   ███    █▄    ███    █▄    ███          ███    █▄  ▀███████████\r\n   ▄█    ███ ███ ▄█▄ ███   ███    ███   ███    ███   ███          ███    ███   ███    ███\r\n ▄████████▀   ▀███▀███▀    ██████████   ██████████  ▄████▀        ██████████   ███    ███\r\n                                                                               ███    ███\r\n   ▄███████▄  ▄██████▄   ▄█    █▄                                                        \r\n  ███    ███ ███    ███ ███    ███                                                       \r\n  ███    ███ ███    ███ ███    ███                                                       \r\n  ███    ███ ███    ███ ███    ███                                                       \r\n▀█████████▀  ███    ███ ███    ███                                                       \r\n  ███        ███    ███ ███    ███                                                       \r\n  ███        ███    ███ ███    ███                                                       \r\n ▄████▀       ▀██████▀   ▀██████▀                                                        ");
+            Console.WriteLine("\n게임을 시작하려면 아무 키나 누르세요");
+            Console.ReadKey(false);
+            Console.Clear();
         }
     }
 }

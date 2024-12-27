@@ -17,8 +17,6 @@ namespace MineSweeperPov
             MineManager mineManager = new MineManager();
             Player player = new Player();
             GameManager gameManager = new GameManager(mineManager, player);
-            //mineManager.MakeMap(9, 10, rnd);
-            //mineManager.PrintMap();
 
             gameManager.GameStart();
         }

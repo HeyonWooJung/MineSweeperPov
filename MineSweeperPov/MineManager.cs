@@ -65,8 +65,8 @@ namespace MineSweeperPov
 
     class MineManager
     {
-        Mine[,] _map;
-        Mine[] _mineArr;
+        Mine[,] _map; //전체 맵
+        Mine[] _mineArr; //지뢰 저장용
 
         int _remainMines = 0;
 
@@ -81,6 +81,7 @@ namespace MineSweeperPov
             return _map[y, x];
         }
 
+        //깃발 세우기
         public void SetPin(int x, int y)
         {
             if (y >= 0 && y < _map.GetLength(0) && x >= 0 && x < _map.GetLength(1))
@@ -108,6 +109,7 @@ namespace MineSweeperPov
             }
         }
 
+        //맵 크기 xy 반환
         public int MapSizeX()
         {
             return _map.GetLength(1);
@@ -116,6 +118,20 @@ namespace MineSweeperPov
         public int MapSizeY()
         {
             return _map.GetLength(0);
+        }
+
+        //찾아낸 지뢰 개수 세기
+        public int FoundMines()
+        {
+            int founded = 0;
+            foreach (var mine in _mineArr)
+            {
+                if (_map[mine.Y, mine.X].IsPinned == true)
+                {
+                    founded++;
+                }
+            }
+            return founded;
         }
 
         //맵 생성
@@ -234,6 +250,7 @@ namespace MineSweeperPov
             }
         }
 
+        //주변 8칸 밝히기
         public void UnveilNearby(int x, int y)
         {
             for (int k = y - 1; k <= y + 1; k++)
@@ -244,6 +261,7 @@ namespace MineSweeperPov
                     {
                         //1차배열이 y임
                         _map[k, l].IsExplored = true;
+                        //상하좌우의 빈 공간 밝히기
                         if (k == y || l == x)
                         {
                             UnveilEmptys(l, k);
@@ -256,39 +274,50 @@ namespace MineSweeperPov
         //주변 빈 공간 밝히기
         public void UnveilEmptys(int x, int y)
         {
-            //스택으로 구현
-            Stack<Mine> mines = new Stack<Mine>();
+            //Stack<Mine> mines = new Stack<Mine>();
+            Queue<Mine> mines = new Queue<Mine>();
+
             Mine mine; //반복문에서 값 가질 친구
-            mines.Push(_map[y, x]); //첫 부분 넣어주기 (xy자리 반대로 넣은 이유는 2차배열에서 왼쪽이 y임)
+
+            //mines.Push(_map[y, x]); //첫 부분 넣어주기 (xy자리 반대로 넣은 이유는 2차배열에서 왼쪽이 y임)
+            mines.Enqueue(_map[y, x]); //첫 부분 넣어주기 (xy자리 반대로 넣은 이유는 2차배열에서 왼쪽이 y임)
+
             //BFS 짭
             while (mines.Any())
             {
-                mine = mines.Pop();
+                //mine = mines.Pop();
+                mine = mines.Dequeue();
                 _map[mine.Y, mine.X].IsExplored = true;
 
+                //주변의 지뢰 수가 0이면 상하좌우의 아직 밝혀지지 않은 것들을 큐에 집어넣음
                 if (mine.NearMines == 0)
                 {
                     if (mine.X - 1 >= 0 && _map[mine.Y, mine.X - 1].NearMines == 0 && _map[mine.Y, mine.X - 1].IsExplored == false)
                     {
-                        mines.Push(_map[mine.Y, mine.X - 1]);
+                        //mines.Push(_map[mine.Y, mine.X - 1]);
+                        mines.Enqueue(_map[mine.Y, mine.X - 1]);
                     }
                     if (mine.X + 1 < _map.GetLength(1) && _map[mine.Y, mine.X + 1].NearMines == 0 && _map[mine.Y, mine.X + 1].IsExplored == false)
                     {
-                        mines.Push(_map[mine.Y, mine.X + 1]);
+                        //mines.Push(_map[mine.Y, mine.X + 1]);
+                        mines.Enqueue(_map[mine.Y, mine.X + 1]);
                     }
 
                     if (mine.Y - 1 >= 0 && _map[mine.Y - 1, mine.X].NearMines == 0 && _map[mine.Y - 1, mine.X].IsExplored == false)
                     {
-                        mines.Push(_map[mine.Y - 1, mine.X]);
+                        //mines.Push(_map[mine.Y - 1, mine.X]);
+                        mines.Enqueue(_map[mine.Y - 1, mine.X]);
                     }
                     if (mine.Y + 1 < _map.GetLength(0) && _map[mine.Y + 1, mine.X].NearMines == 0 && _map[mine.Y + 1, mine.X].IsExplored == false)
                     {
-                        mines.Push(_map[mine.Y + 1, mine.X]);
+                        //mines.Push(_map[mine.Y + 1, mine.X]);
+                        mines.Enqueue(_map[mine.Y + 1, mine.X]);
                     }
                 }
             }
         }
 
+        //모든 칸을 밝혔는가
         public bool IsEverythingSearched()
         {
             foreach (var mine in _map)
@@ -301,6 +330,7 @@ namespace MineSweeperPov
             return true;
         }
 
+        //모든 지뢰에 깃발이 꽂혔는가
         public bool IsEveryMinePinned()
         {
             foreach (var mine in _mineArr)
